@@ -4,19 +4,28 @@ from tkinter import *
 from datetime import datetime
 # importing math module to perfom calculations
 import math
+# importing PIL to handle images
+from PIL import Image
 
 # creating tkinter window called root
 root = Tk()
-# adjust size of window
-root.geometry("180x180")
 # give the window a title
 root.title('Analog Clock')
 
-# add image file
-bg = PhotoImage(file="./assets/watch-bg.png")
+# select image file
+bg_filename="./assets/watch-bg2.png"
+# get image size
+with Image.open(bg_filename) as img:
+    w = img.size[0]
+    h = img.size[1]
+
+# adjust size of window
+root.geometry(str(w)+"x"+str(h))
+bg = PhotoImage(file=bg_filename)
+
 
 # create a canvas widget and image as background
-canvas=Canvas(root, width=180, height=180)
+canvas=Canvas(root, width=w, height=h)
 canvas.pack(fill = "both", expand = True)
 canvas.create_image( 0, 0, image = bg, anchor = "nw")
 
@@ -35,24 +44,28 @@ def update_time():
     seconds_angle=seconds*6
 
     # updates hands coords to match the calculated angles
-    canvas.coords(h_hand,90,90,90+r_hours*math.sin(math.radians(hours_angle)),90-r_hours*math.cos(math.radians(hours_angle)))
-    canvas.coords(m_hand,90,90,90+r_minutes*math.sin(math.radians(minutes_angle)),90-r_minutes*math.cos(math.radians(minutes_angle)))
-    canvas.coords(s_hand,90,90,90+r_seconds*math.sin(math.radians(seconds_angle)),90-r_seconds*math.cos(math.radians(seconds_angle)))
+    canvas.coords(h_hand,center_x,center_y,center_x+r_hours*math.sin(math.radians(hours_angle)),center_y-r_hours*math.cos(math.radians(hours_angle)))
+    canvas.coords(m_hand,center_x,center_y,center_x+r_minutes*math.sin(math.radians(minutes_angle)),center_y-r_minutes*math.cos(math.radians(minutes_angle)))
+    canvas.coords(s_hand,center_x,center_y,center_x+r_seconds*math.sin(math.radians(seconds_angle)),center_y-r_seconds*math.cos(math.radians(seconds_angle)))
     
     # update time every 1000ms (1s)
     root.after(1000,update_time)
 
 # set length of hands
-r_hours=40
-r_minutes=70
-r_seconds=70 
+r_hours=0.2*h
+r_minutes=0.3*h
+r_seconds=0.3*h
+
+#Setting image center
+center_x=w/2
+center_y=h/2
 
 # add a hour hand in canvas widget
-h_hand = canvas.create_line(90,90,90,90-r_hours, fill="black", width=2)
+h_hand = canvas.create_line(center_x,center_y,center_x,center_y-r_hours, fill="black", width=4)
 # add a minute hand in canvas widget
-m_hand = canvas.create_line(90,90,90,90-r_minutes, fill="black", width=2)
+m_hand = canvas.create_line(center_x,center_y,center_x,center_y-r_minutes, fill="black", width=4)
 # add a second hand in canvas widget
-s_hand = canvas.create_line(90,90,90,90-r_seconds, fill="red", width=1)
+s_hand = canvas.create_line(center_x,center_y,center_x,center_y-r_seconds, fill="red", width=2)
 
 # call update_time method    
 update_time()
